@@ -21,8 +21,8 @@ value = succ . fromEnum
 fromValue :: Value -> Die
 fromValue = toEnum . pred
 
-zeroValue :: Value
-zeroValue = 0
+noValue :: Value
+noValue = 0
 
 type Roll = [Die]
 
@@ -46,7 +46,7 @@ scoreIf :: Special -> Scoring
 scoreIf s = \r ->
   case check s r of
     True -> scoring s r
-    _    -> zeroValue
+    _    -> noValue
 
 threeOfAKind :: Special
 threeOfAKind  = Special { check = hasOfAKind 3, scoring = sumOfValues }
