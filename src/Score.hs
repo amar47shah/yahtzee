@@ -48,26 +48,23 @@ scoreIf s = \r ->
     True -> scoring s r
     _    -> noValue
 
-threeOfAKind :: Special
-threeOfAKind  = Special { check = hasOfAKind 3, scoring = sumOfValues }
-
-fourOfAKind :: Special
-fourOfAKind  = Special { check = hasOfAKind 4, scoring = sumOfValues }
-
-chance :: Special
-chance  = Special { check = const True, scoring = sumOfValues }
+threeOfAKind, fourOfAKind, fullHouse, smallStraight, largeStraight, yahtzee, chance :: Special
+threeOfAKind  = Special { check = hasOfAKind  3, scoring = sumOfValues }
+fourOfAKind   = Special { check = hasOfAKind  4, scoring = sumOfValues }
+fullHouse     = Special { check = isFullHouse  , scoring = const 25    }
+smallStraight = Special { check = hasStraight 4, scoring = const 30    }
+largeStraight = Special { check = hasStraight 5, scoring = const 40    }
+yahtzee       = Special { check = hasOfAKind  5, scoring = const 50    }
+chance        = Special { check = const True   , scoring = sumOfValues }
 
 sumOfValues :: Scoring
 sumOfValues = sum . values
 
-yahtzee :: Special
-yahtzee  = Special { check = hasOfAKind 5, scoring = const 50 }
-
 hasOfAKind :: Int -> Check
 hasOfAKind n = any (>= n) . kindCounts
 
-fullHouse :: Special
-fullHouse  = Special { check = isFullHouse, scoring = const 25 }
+hasStraight :: Int -> Check
+hasStraight n = any isStraight . windowsOfSorted n
 
 isFullHouse :: Check
 isFullHouse = (`elem` [[2,3], [3,2]]) . filter (/= 0) . kindCounts
@@ -77,15 +74,6 @@ kindCounts r = (`kindCount` r) <$> dice
 
 kindCount :: Die -> Roll -> Int
 kindCount d = length . filter (== d)
-
-smallStraight :: Special
-smallStraight  = Special { check = hasStraight 4, scoring = const 30 }
-
-largeStraight :: Special
-largeStraight  = Special { check = hasStraight 5, scoring = const 40 }
-
-hasStraight :: Int -> Check
-hasStraight n = any isStraight . windowsOfSorted n
 
 isStraight :: Check
 isStraight r = case values r of
