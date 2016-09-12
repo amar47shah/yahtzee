@@ -1,6 +1,6 @@
 module Score where
 
-import Data.List (sort, tails)
+import Data.List (nub, sort, tails)
 
 data Die = One
          | Two
@@ -88,10 +88,13 @@ hasStraight :: Int -> Check
 hasStraight n = any isStraight . windowsOfSorted n
 
 isStraight :: Check
-isStraight [] = True
-isStraight r  = let vs = values r
-                 in all (== 1) $ zipWith (-) (tail vs) vs
+isStraight r = case values r of
+  vs@(_:vs') -> all (== 1) $ zipWith (-) vs' vs
+  _          -> True
 
 windowsOfSorted :: Int -> Roll -> [Roll]
-windowsOfSorted n r = let m = 1 - n + length r
-                       in map (take n) . take m . tails $ sort r
+windowsOfSorted n r =
+    map (take n) . take m . tails . sort $ u
+  where
+    u = nub r
+    m = 1 - n + length u
