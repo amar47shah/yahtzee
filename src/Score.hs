@@ -63,26 +63,24 @@ sumOfValues = sum . values
 hasOfAKind :: Int -> Check
 hasOfAKind n = any (>= n) . kindCounts
 
-hasStraight :: Int -> Check
-hasStraight n = any isStraight . windowsOfSorted n
-
 isFullHouse :: Check
-isFullHouse = (`elem` [[2,3], [3,2]]) . filter (/= 0) . kindCounts
+isFullHouse = ([2,3] ==) . sort . filter (> 0) . kindCounts
 
 kindCounts :: Roll -> [Int]
-kindCounts r = (`kindCount` r) <$> dice
+kindCounts r = (`count` r) <$> dice
 
-kindCount :: Die -> Roll -> Int
-kindCount d = length . filter (== d)
+hasStraight :: Int -> Check
+hasStraight n = any (isIncreasingByOne . values) . windowsOf n . sort . nub
 
-isStraight :: Check
-isStraight r = case values r of
-  vs@(_:vs') -> all (== 1) $ zipWith (-) vs' vs
-  _          -> True
+-- Utilities
 
-windowsOfSorted :: Int -> Roll -> [Roll]
-windowsOfSorted n r =
-    map (take n) . take m . tails . sort $ u
-  where
-    u = nub r
-    m = 1 - n + length u
+count :: Eq a => a -> [a] -> Int
+count x = length . filter (== x)
+
+isIncreasingByOne :: (Eq a, Num a) => [a] -> Bool
+isIncreasingByOne [] = True
+isIncreasingByOne xs = all (== 1) $ zipWith (-) (tail xs) xs
+
+windowsOf :: Int -> [a] -> [[a]]
+windowsOf n = filter (exactlyLong n) . map (take n) . tails
+  where exactlyLong n = (n ==) . length
