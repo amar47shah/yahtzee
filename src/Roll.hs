@@ -10,7 +10,9 @@ module Roll ( Die
             , values
             ) where
 
-import Control.Arrow (Arrow, (***), first)
+import Utilities ((...), both, replicateA)
+
+import Control.Arrow (first)
 import Control.Monad (join)
 import System.Random (Random, random, randomIO, randomR)
 
@@ -56,16 +58,3 @@ randomRoll n = replicateA n randomDie
 
 randomFive :: IO Roll
 randomFive = randomRoll 5
-
--- Utilities
-
-both :: Arrow a => a b c -> a (b, b) (c, c)
-both = join (***)
-
-(...) :: (c -> d) -> (a -> b -> c) -> a -> b -> d
-(...) = (.) . (.)
-
-infixr 8 ...
-
-replicateA :: Applicative f => Int -> f a -> f [a]
-replicateA = sequenceA ... replicate

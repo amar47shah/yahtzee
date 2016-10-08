@@ -1,7 +1,9 @@
 module Score where
 
 import Roll (Die, Roll, Value, dice, noValue, value, values)
-import Data.List (nub, sort, tails)
+import Utilities (count, isIncreasingByOne, windowsOf)
+
+import Data.List (nub, sort)
 
 type Scoring = Roll -> Value
 
@@ -42,16 +44,3 @@ kindCounts r = (`count` r) <$> dice
 
 hasStraight :: Int -> Check
 hasStraight n = any (isIncreasingByOne . values) . windowsOf n . sort . nub
-
--- Utilities
-
-count :: Eq a => a -> [a] -> Int
-count x = length . filter (== x)
-
-isIncreasingByOne :: (Eq a, Num a) => [a] -> Bool
-isIncreasingByOne [] = True
-isIncreasingByOne xs = all (== 1) $ zipWith (-) (tail xs) xs
-
-windowsOf :: Int -> [a] -> [[a]]
-windowsOf n = filter (exactlyLong n) . map (take n) . tails
-  where exactlyLong n = (n ==) . length
