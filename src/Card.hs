@@ -1,26 +1,24 @@
 module Card where
 
-import Roll (Face, Value, faces)
-import Score (Score, Special, specials)
+import Score (Score, Combo, counters, specials)
 import Utilities ((...))
 
 import Control.Applicative (liftA2)
 import qualified Data.Map.Strict as M
 
-data Game = Game { upper :: UpperSection
-                 , lower :: LowerSection
+data Game = Game { upper :: Section
+                 , lower :: Section
                  } deriving Show
 
-type UpperSection = M.Map Face Score
-type LowerSection = M.Map Special Score
+type Section = M.Map Combo Score
 
 initial :: Game
 initial = Game initialUpper initialLower
 
-initialUpper :: UpperSection
-initialUpper = fromKeysWith Nothing faces
+initialUpper :: Section
+initialUpper = fromKeysWith Nothing counters
 
-initialLower :: LowerSection
+initialLower :: Section
 initialLower = fromKeysWith Nothing specials
 
 fromKeysWith :: Ord a => b -> [a] -> M.Map a b

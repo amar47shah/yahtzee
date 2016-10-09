@@ -1,4 +1,5 @@
 module Utilities ( (...)
+                 , always
                  , both
                  , count
                  , isIncreasingByOne
@@ -14,6 +15,9 @@ import Data.List (tails)
 (...) = (.) . (.)
 
 infixr 8 ...
+
+always :: a -> Bool
+always = const True
 
 both :: Arrow a => a b c -> a (b, b) (c, c)
 both = join (***)

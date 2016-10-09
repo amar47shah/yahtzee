@@ -1,10 +1,11 @@
 module Score ( Score
-             , Special
+             , Combo
+             , counters
              , specials
              ) where
 
 import Roll (Face, Roll, Value, faces, noValue, value, values)
-import Utilities (count, isIncreasingByOne, windowsOf)
+import Utilities (always, count, isIncreasingByOne, windowsOf)
 
 import Data.Function (on)
 import Data.List (nub, sort)
@@ -12,36 +13,44 @@ import Data.List (nub, sort)
 type Score = Maybe Value
 type Scoring = Roll -> Value
 
+type Check   = Roll -> Bool
+data Combo = Combo { name    :: String
+                   , check   :: Check
+                   , scoring :: Scoring
+                   }
+
+instance Eq Combo where
+  (==) = (==) `on` name
+
+instance Ord Combo where
+  compare = compare `on` name
+
+instance Show Combo where
+  show = show . name
+
+counters :: [Combo]
+counters = counter <$> faces
+      where
+  counter f = Combo { name    = show (value f) ++ "s"
+                    , check   = always
+                    , scoring = countAndAddOnly f
+                    }
+
 countAndAddOnly :: Face -> Scoring
 countAndAddOnly d = (* value d) . length . filter (== d)
 
-type Check   = Roll -> Bool
-data Special = Special { name    :: String
-                       , check   :: Check
-                       , scoring :: Scoring
-                       }
-
-instance Eq Special where
-  (==) = (==) `on` name
-
-instance Ord Special where
-  compare = compare `on` name
-
-instance Show Special where
-  show = show . name
-
-specials :: [Special]
+specials :: [Combo]
 specials =
-  [ Special { name = "3 of a Kind"   , check = hasOfAKind  3, scoring = sumOfValues }
-  , Special { name = "4 of a Kind"   , check = hasOfAKind  4, scoring = sumOfValues }
-  , Special { name = "Full House"    , check = isFullHouse  , scoring = const 25    }
-  , Special { name = "Small Straight", check = hasStraight 4, scoring = const 30    }
-  , Special { name = "Large Straight", check = hasStraight 5, scoring = const 40    }
-  , Special { name = "Yahtzee"       , check = hasOfAKind  5, scoring = const 50    }
-  , Special { name = "Chance"        , check = const True   , scoring = sumOfValues }
+  [ Combo { name = "Three of a Kind", check = hasOfAKind  3, scoring = sumOfValues }
+  , Combo { name = "Four of a Kind" , check = hasOfAKind  4, scoring = sumOfValues }
+  , Combo { name = "Full House"     , check = isFullHouse  , scoring = const 25    }
+  , Combo { name = "Small Straight" , check = hasStraight 4, scoring = const 30    }
+  , Combo { name = "Large Straight" , check = hasStraight 5, scoring = const 40    }
+  , Combo { name = "Yahtzee"        , check = hasOfAKind  5, scoring = const 50    }
+  , Combo { name = "Chance"         , check = always       , scoring = sumOfValues }
   ]
 
-scoreIf :: Special -> Scoring
+scoreIf :: Combo -> Scoring
 scoreIf s = \r -> if check s r then scoring s r else noValue
 
 sumOfValues :: Scoring
