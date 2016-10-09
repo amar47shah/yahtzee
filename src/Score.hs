@@ -13,7 +13,7 @@ import Data.List (nub, sort)
 type Score = Maybe Value
 type Scoring = Roll -> Value
 
-type Check   = Roll -> Bool
+type Check = Roll -> Bool
 data Combo = Combo { name    :: String
                    , check   :: Check
                    , scoring :: Scoring
