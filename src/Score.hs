@@ -28,6 +28,9 @@ instance Ord Combo where
 instance Show Combo where
   show = show . name
 
+scoreIf :: Combo -> Scoring
+scoreIf s = \r -> if check s r then scoring s r else noValue
+
 counters :: [Combo]
 counters = counter <$> faces
       where
@@ -35,9 +38,6 @@ counters = counter <$> faces
                     , check   = always
                     , scoring = countAndAddOnly f
                     }
-
-countAndAddOnly :: Face -> Scoring
-countAndAddOnly d = (* value d) . length . filter (== d)
 
 specials :: [Combo]
 specials =
@@ -50,20 +50,20 @@ specials =
   , Combo { name = "Chance"         , check = always       , scoring = sumOfValues }
   ]
 
-scoreIf :: Combo -> Scoring
-scoreIf s = \r -> if check s r then scoring s r else noValue
+countAndAddOnly :: Face -> Scoring
+countAndAddOnly f = (* value f) . length . filter (== f)
 
 sumOfValues :: Scoring
 sumOfValues = sum . values
 
-hasOfAKind :: Int -> Check
-hasOfAKind n = any (>= n) . faceCounts
-
 isFullHouse :: Check
 isFullHouse = ([2,3] ==) . sort . filter (> 0) . faceCounts
 
-faceCounts :: Roll -> [Int]
-faceCounts r = (`count` r) <$> faces
-
 hasStraight :: Int -> Check
 hasStraight n = any (isIncreasingByOne . values) . windowsOf n . sort . nub
+
+hasOfAKind :: Int -> Check
+hasOfAKind n = any (>= n) . faceCounts
+
+faceCounts :: Roll -> [Int]
+faceCounts r = (`count` r) <$> faces
