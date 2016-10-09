@@ -3,7 +3,9 @@ module Card where
 import Score (Score, Combo, counters, specials)
 import Utilities (fromKeysWith, sumA)
 
+import Control.Arrow ((&&&))
 import Data.Function (on)
+import Data.Maybe (isNothing)
 import qualified Data.Map.Strict as M
 
 data Card = Card { upper :: Section
@@ -26,3 +28,6 @@ upperTotal = fmap addBonus . sumA . upper
 
 lowerTotal :: Card -> Score
 lowerTotal = sumA . lower
+
+open :: Card -> Card
+open = uncurry (Card `on` M.filter isNothing) . (upper &&& lower)
