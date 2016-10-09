@@ -3,6 +3,7 @@ module Card where
 import Score (Score, Combo, counters, specials)
 import Utilities (fromKeysWith, sumA)
 
+import Data.Function (on)
 import qualified Data.Map.Strict as M
 
 data Card = Card { upper :: Section
@@ -12,13 +13,7 @@ data Card = Card { upper :: Section
 type Section = M.Map Combo Score
 
 initial :: Card
-initial = Card initialUpper initialLower
-
-initialUpper :: Section
-initialUpper = fromKeysWith Nothing counters
-
-initialLower :: Section
-initialLower = fromKeysWith Nothing specials
+initial = (Card `on` fromKeysWith Nothing) counters specials
 
 total :: Card -> Score
 total g = (+) <$> upperTotal g <*> lowerTotal g
