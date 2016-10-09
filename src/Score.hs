@@ -16,10 +16,7 @@ data Special = Special { check   :: Check
                        }
 
 scoreIf :: Special -> Scoring
-scoreIf s = \r ->
-  case check s r of
-    True -> scoring s r
-    _    -> noValue
+scoreIf s = \r -> if check s r then scoring s r else noValue
 
 threeOfAKind, fourOfAKind, fullHouse, smallStraight, largeStraight, yahtzee, chance :: Special
 threeOfAKind  = Special { check = hasOfAKind  3, scoring = sumOfValues }
