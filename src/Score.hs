@@ -1,13 +1,13 @@
 module Score where
 
-import Roll (Die, Roll, Value, dice, noValue, value, values)
+import Roll (Face, Roll, Value, faces, noValue, value, values)
 import Utilities (count, isIncreasingByOne, windowsOf)
 
 import Data.List (nub, sort)
 
 type Scoring = Roll -> Value
 
-countAndAddOnly :: Die -> Scoring
+countAndAddOnly :: Face -> Scoring
 countAndAddOnly d = (* value d) . length . filter (== d)
 
 type Check   = Roll -> Bool
@@ -34,13 +34,13 @@ sumOfValues :: Scoring
 sumOfValues = sum . values
 
 hasOfAKind :: Int -> Check
-hasOfAKind n = any (>= n) . kindCounts
+hasOfAKind n = any (>= n) . faceCounts
 
 isFullHouse :: Check
-isFullHouse = ([2,3] ==) . sort . filter (> 0) . kindCounts
+isFullHouse = ([2,3] ==) . sort . filter (> 0) . faceCounts
 
-kindCounts :: Roll -> [Int]
-kindCounts r = (`count` r) <$> dice
+faceCounts :: Roll -> [Int]
+faceCounts r = (`count` r) <$> faces
 
 hasStraight :: Int -> Check
 hasStraight n = any (isIncreasingByOne . values) . windowsOf n . sort . nub

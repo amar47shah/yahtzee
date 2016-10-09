@@ -1,7 +1,7 @@
-module Roll ( Die
+module Roll ( Face
             , Roll
             , Value
-            , dice
+            , faces
             , fromValue
             , fromValues
             , noValue
@@ -16,29 +16,29 @@ import Control.Arrow (first)
 import Control.Monad (join)
 import System.Random (Random, random, randomIO, randomR)
 
-data Die = One
-         | Two
-         | Three
-         | Four
-         | Five
-         | Six
-         deriving (Enum, Bounded, Eq, Ord, Show)
+data Face = One
+          | Two
+          | Three
+          | Four
+          | Five
+          | Six
+          deriving (Enum, Bounded, Eq, Ord, Show)
 
-dice :: [Die]
-dice = enumFrom One
+faces :: [Face]
+faces = enumFrom One
 
 type Value = Int
 
-value :: Die -> Value
+value :: Face -> Value
 value = succ . fromEnum
 
-fromValue :: Value -> Die
+fromValue :: Value -> Face
 fromValue = toEnum . pred
 
 noValue :: Value
 noValue = 0
 
-type Roll = [Die]
+type Roll = [Face]
 
 fromValues :: [Value] -> Roll
 fromValues = fmap fromValue
@@ -46,15 +46,15 @@ fromValues = fmap fromValue
 values :: Roll -> [Value]
 values = fmap value
 
-instance Random Die where
+instance Random Face where
   random = randomR (minBound, maxBound)
   randomR = first toEnum ... randomR . both fromEnum
 
-randomDie :: IO Die
-randomDie = randomIO
+randomFace :: IO Face
+randomFace = randomIO
 
 randomRoll :: Int -> IO Roll
-randomRoll n = replicateA n randomDie
+randomRoll n = replicateA n randomFace
 
 randomFive :: IO Roll
 randomFive = randomRoll 5
