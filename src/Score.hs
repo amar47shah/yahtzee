@@ -1,53 +1,63 @@
-module Score ( Score
-             , Combo
+module Score ( Combo
+             , Name
+             , Score
+             , combos
              , counters
+             , score
              , specials
              ) where
 
 import Roll (Face, Roll, Value, faces, noValue, value, values)
 import Utilities (always, count, isIncreasingByOne, windowsOf)
 
+import Control.Arrow ((&&&))
 import Data.Function (on)
 import Data.List (nub, sort)
+import qualified Data.Map.Strict as M
 
-type Score = Maybe Value
+type Name    = String
+type Score   = Maybe Value
 type Scoring = Roll -> Value
+type Check   = Roll -> Bool
+type Table   = M.Map Name Combo
 
-type Check = Roll -> Bool
-data Combo = Combo { name    :: String
-                   , check   :: Check
+data Combo = Combo { check   :: Check
                    , scoring :: Scoring
                    }
 
-instance Eq Combo where
-  (==) = (==) `on` name
-
-instance Ord Combo where
-  compare = compare `on` name
-
-instance Show Combo where
-  show = show . name
+score :: Roll -> Name -> Score
+score r n = scoreIf <$> M.lookup n combos <*> pure r
 
 scoreIf :: Combo -> Scoring
-scoreIf s = \r -> if check s r then scoring s r else noValue
+scoreIf c = \r -> if check c r then scoring c r else noValue
 
-counters :: [Combo]
-counters = counter <$> faces
-      where
-  counter f = Combo { name    = show (value f) ++ "s"
-                    , check   = always
-                    , scoring = countAndAddOnly f
-                    }
+combos :: Table
+combos = countersTable `M.union` specialsTable
 
-specials :: [Combo]
-specials =
-  [ Combo { name = "Three of a Kind", check = hasOfAKind  3, scoring = sumOfValues }
-  , Combo { name = "Four of a Kind" , check = hasOfAKind  4, scoring = sumOfValues }
-  , Combo { name = "Full House"     , check = isFullHouse  , scoring = const 25    }
-  , Combo { name = "Small Straight" , check = hasStraight 4, scoring = const 30    }
-  , Combo { name = "Large Straight" , check = hasStraight 5, scoring = const 40    }
-  , Combo { name = "Yahtzee"        , check = hasOfAKind  5, scoring = const 50    }
-  , Combo { name = "Chance"         , check = always       , scoring = sumOfValues }
+counters :: [Name]
+counters = M.keys countersTable
+
+specials :: [Name]
+specials = M.keys specialsTable
+
+countersTable :: Table
+countersTable = M.fromList $ fmap (name &&& counter) faces
+
+name :: Face -> Name
+name f = show (value f) ++ "s"
+
+counter :: Face -> Combo
+counter f = Combo { check = always, scoring = countAndAddOnly f }
+
+specialsTable :: Table
+specialsTable = M.fromList
+  [ ("Three of a Kind", Combo { check = hasOfAKind  3, scoring = sumOfValues })
+  , ("Four of a Kind" , Combo { check = hasOfAKind  4, scoring = sumOfValues })
+  , ("Full House"     , Combo { check = isFullHouse  , scoring = const 25    })
+  , ("Small Straight" , Combo { check = hasStraight 4, scoring = const 30    })
+  , ("Large Straight" , Combo { check = hasStraight 5, scoring = const 40    })
+  , ("Yahtzee"        , Combo { check = hasOfAKind  5, scoring = const 50    })
+  , ("Chance"         , Combo { check = always       , scoring = sumOfValues })
   ]
 
 countAndAddOnly :: Face -> Scoring

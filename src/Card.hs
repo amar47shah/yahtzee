@@ -1,8 +1,10 @@
 module Card where
 
-import Score (Score, Combo, counters, specials)
+import Roll (Roll)
+import Score (Combo, Name, Score, counters, score, specials)
 import Utilities (fromKeysWith, sumA)
 
+import Control.Applicative ((<|>))
 import Control.Arrow ((&&&))
 import Data.Function (on)
 import Data.Maybe (isNothing)
@@ -12,22 +14,27 @@ data Card = Card { upper :: Section
                  , lower :: Section
                  } deriving Show
 
-type Section = M.Map Combo Score
+type Section = M.Map Name Score
 
 initial :: Card
 initial = (Card `on` fromKeysWith Nothing) counters specials
 
 total :: Card -> Score
-total g = (+) <$> upperTotal g <*> lowerTotal g
+total c = (+) <$> upperTotal c <*> lowerTotal c
 
 upperTotal :: Card -> Score
 upperTotal = fmap addBonus . sumA . upper
-  where addBonus n
-         | n >= 63   = n + 35
-         | otherwise = n
+  where addBonus n | n >= 63   = n + 35
+                   | otherwise = n
 
 lowerTotal :: Card -> Score
 lowerTotal = sumA . lower
 
 open :: Card -> Card
-open = uncurry (Card `on` M.filter isNothing) . (upper &&& lower)
+open = upperAndLower $ M.filter isNothing
+
+bank :: Card -> Roll -> Name -> Card
+bank c r n = upperAndLower (M.adjust (<|> score r n) n) c
+
+upperAndLower :: (Section -> Section) -> Card -> Card
+upperAndLower f = uncurry (Card `on` f) . (upper &&& lower)
