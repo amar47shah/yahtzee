@@ -1,4 +1,10 @@
-module Card where
+module Card ( bank
+            , initial
+            , lowerTotal
+            , open
+            , total
+            , upperTotal
+            ) where
 
 import Roll (Roll)
 import Score (Combo, Name, Score, counters, score, specials)
