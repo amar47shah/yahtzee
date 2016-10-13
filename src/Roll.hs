@@ -5,7 +5,8 @@ module Roll ( Face
             , fromValue
             , fromValues
             , noValue
-            , randomFive
+            , reroll
+            , roll
             , value
             , values
             ) where
@@ -56,5 +57,8 @@ randomFace = randomIO
 randomRoll :: Int -> IO Roll
 randomRoll n = replicateA n randomFace
 
-randomFive :: IO Roll
-randomFive = randomRoll 5
+roll :: IO Roll
+roll = randomRoll 5
+
+reroll :: Roll -> Roll -> IO Roll
+reroll r = fmap (r ++) . randomRoll . length
