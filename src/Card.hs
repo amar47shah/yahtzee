@@ -1,4 +1,5 @@
-module Card ( bank
+module Card ( Card
+            , bank
             , initial
             , lowerTotal
             , open
