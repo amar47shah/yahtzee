@@ -43,7 +43,7 @@ replicateA :: Applicative f => Int -> f a -> f [a]
 replicateA = sequenceA ... replicate
 
 sumA :: (Num a, Foldable t, Applicative f) => t (f a) -> f a
-sumA = foldr (liftA2 (+)) $ pure 0
+sumA = liftA2 (+) `foldr` pure 0
 
 windowsOf :: Int -> [a] -> [[a]]
 windowsOf n = filter (exactlyLong n) . map (take n) . tails
