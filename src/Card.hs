@@ -12,7 +12,6 @@ import Score (Name, Score, counters, score, specials)
 import Utilities (fromKeysWith, sumA)
 
 import Control.Applicative ((<|>))
-import Control.Arrow ((&&&))
 import Data.Function (on)
 import Data.Maybe (isNothing)
 import qualified Data.Map.Strict as M
@@ -41,7 +40,7 @@ open :: Card -> Card
 open = upperAndLower $ M.filter isNothing
 
 bank :: Card -> Roll -> Name -> Card
-bank c r n = upperAndLower (M.adjust (<|> score r n) n) c
+bank c r n = M.adjust (<|> score r n) n `upperAndLower` c
 
 upperAndLower :: (Section -> Section) -> Card -> Card
-upperAndLower f = uncurry (Card `on` f) . (upper &&& lower)
+upperAndLower f = (Card `on` f) <$> upper <*> lower

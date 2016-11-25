@@ -75,4 +75,4 @@ hasOfAKind :: Int -> Check
 hasOfAKind n = any (>= n) . faceCounts
 
 faceCounts :: Roll -> [Int]
-faceCounts r = (`count` r) <$> faces
+faceCounts = sequenceA $ fmap count faces
