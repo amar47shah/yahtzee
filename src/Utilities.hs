@@ -29,6 +29,10 @@ both = join (***)
 count :: Eq a => a -> [a] -> Int
 count x = length . filter (== x)
 
+differences :: Num a => [a] -> [a]
+differences l@(_:t) = zipWith (-) t l
+differences _       = []
+
 exactlyLong :: Int -> [a] -> Bool
 exactlyLong n = (n ==) . length
 
@@ -36,8 +40,7 @@ fromKeysWith :: Ord a => b -> [a] -> M.Map a b
 fromKeysWith = M.fromList ... fmap . flip (,)
 
 isIncreasingByOne :: (Eq a, Num a) => [a] -> Bool
-isIncreasingByOne [] = True
-isIncreasingByOne xs = all (== 1) $ zipWith (-) (tail xs) xs
+isIncreasingByOne = all (== 1) . differences
 
 replicateA :: Applicative f => Int -> f a -> f [a]
 replicateA = sequenceA ... replicate
