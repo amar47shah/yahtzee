@@ -8,7 +8,7 @@ module Card ( Card
             ) where
 
 import Roll (Roll)
-import Score (Combo, Name, Score, counters, score, specials)
+import Score (Name, Score, counters, score, specials)
 import Utilities (fromKeysWith, sumA)
 
 import Control.Applicative ((<|>))

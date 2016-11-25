@@ -14,7 +14,6 @@ module Roll ( Face
 import Utilities ((...), both, replicateA)
 
 import Control.Arrow (first)
-import Control.Monad (join)
 import System.Random (Random, random, randomIO, randomR)
 
 data Face = One

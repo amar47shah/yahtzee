@@ -15,7 +15,11 @@ cabal-version:       >=1.10
 
 library
   hs-source-dirs:      src
-  exposed-modules:     Card, Roll, Score
+  exposed-modules:     Card
+                     , Roll
+                     , Score
+                     , Utilities
+  ghc-options:         -Wall -Werror
   build-depends:       base >= 4.7 && < 5
                      , containers
                      , random
@@ -24,18 +28,19 @@ library
 executable yahtzee-exe
   hs-source-dirs:      app
   main-is:             Main.hs
-  ghc-options:         -threaded -rtsopts -with-rtsopts=-N
+  ghc-options:         -Wall -Werror -threaded -rtsopts -with-rtsopts=-N
   build-depends:       base
                      , yahtzee
+                     , random
   default-language:    Haskell2010
 
 test-suite yahtzee-test
   type:                exitcode-stdio-1.0
   hs-source-dirs:      test
   main-is:             Spec.hs
+  ghc-options:         -Wall -Werror -threaded -rtsopts -with-rtsopts=-N
   build-depends:       base
                      , yahtzee
-  ghc-options:         -threaded -rtsopts -with-rtsopts=-N
   default-language:    Haskell2010
 
 source-repository head

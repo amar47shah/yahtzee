@@ -11,7 +11,6 @@ import Roll (Face, Roll, Value, faces, noValue, value, values)
 import Utilities (always, count, isIncreasingByOne, windowsOf)
 
 import Control.Arrow ((&&&))
-import Data.Function (on)
 import Data.List (nub, sort)
 import qualified Data.Map.Strict as M
 
